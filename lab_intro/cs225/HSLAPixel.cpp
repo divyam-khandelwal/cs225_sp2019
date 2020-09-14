@@ -11,5 +11,33 @@
 #include <iostream>
 using namespace std;
 
-namespace cs225 {
-}
+namespace cs225
+{
+
+    HSLAPixel::HSLAPixel()
+    {
+        a = 1.0;
+    }
+
+    HSLAPixel::HSLAPixel(double hue,
+                         double saturation,
+                         double luminance)
+    {
+        a = 1.0;
+        h = hue;
+        l = luminance;
+        s = saturation;
+    }
+
+    HSLAPixel::HSLAPixel(double hue,
+                         double saturation,
+                         double luminance,
+                         double alpha)
+    {
+        a = alpha;
+        h = hue;
+        l = luminance;
+        s = saturation;
+    }
+
+} // namespace cs225
