@@ -62,10 +62,23 @@ PNG grayscale(PNG image) {
  */
 PNG createSpotlight(PNG image, int centerX, int centerY) {
 
+  for (unsigned x = 0; x < image.width(); x++) {
+    for (unsigned y = 0; y < image.height(); y++) {
+      HSLAPixel & pixel = image.getPixel(x, y);
+
+      double euclidean_distance = sqrt((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY));
+      
+      double luminance_drop = 0.2;
+      if (euclidean_distance < 160.0) {
+        luminance_drop = 1 - euclidean_distance * .5 / 100;
+      }
+      
+      pixel.l = pixel.l * luminance_drop;
+    }
+  }
+
   return image;
-  
 }
- 
 
 /**
  * Returns a image transformed to Illini colors.
@@ -79,12 +92,30 @@ PNG createSpotlight(PNG image, int centerX, int centerY) {
 **/
 PNG illinify(PNG image) {
 
+  const int orange_hue = 11;
+  const int blue_hue = 216;
+
+  for (unsigned x = 0; x < image.width(); x++) {
+    for (unsigned y = 0; y < image.height(); y++) {
+      HSLAPixel & pixel = image.getPixel(x, y);
+
+      double orange_hue_diff = std::abs(orange_hue - pixel.h);
+      double blue_hue_diff = std::abs(blue_hue - pixel.h);
+
+      if (orange_hue_diff < blue_hue_diff) {
+        pixel.h = orange_hue;
+      } else {
+        pixel.h = blue_hue;
+      }
+    }
+  }
+      
   return image;
 }
  
 
 /**
-* Returns an immge that has been watermarked by another image.
+* Returns an image that has been watermarked by another image.
 *
 * The luminance of every pixel of the second image is checked, if that
 * pixel's luminance is 1 (100%), then the pixel at the same location on
@@ -97,5 +128,19 @@ PNG illinify(PNG image) {
 */
 PNG watermark(PNG firstImage, PNG secondImage) {
 
+  cs225::PNG watermark;
+  watermark = PNG(secondImage);
+  // watermark.resize(firstImage.width(), firstImage.height());
+
+  for (unsigned x = 0; x < firstImage.width(); x++) {
+    for (unsigned y = 0; y < firstImage.height(); y++) {
+
+      HSLAPixel & watermarkPixel = watermark.getPixel(x, y);
+      if (watermarkPixel.l == 1.0) {
+        HSLAPixel & imagePixel = firstImage.getPixel(x, y);
+        imagePixel.l = std::min(1.0, imagePixel.l + 0.2);
+      }
+    }
+  }
   return firstImage;
 }
