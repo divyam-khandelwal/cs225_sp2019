@@ -21,12 +21,15 @@ using cs225::PNG;
  *
  * @return The grayscale image.
  */
-PNG grayscale(PNG image) {
+PNG grayscale(PNG image)
+{
   /// This function is already written for you so you can see how to
   /// interact with our PNG class.
-  for (unsigned x = 0; x < image.width(); x++) {
-    for (unsigned y = 0; y < image.height(); y++) {
-      HSLAPixel & pixel = image.getPixel(x, y);
+  for (unsigned x = 0; x < image.width(); x++)
+  {
+    for (unsigned y = 0; y < image.height(); y++)
+    {
+      HSLAPixel &pixel = image.getPixel(x, y);
 
       // `pixel` is a pointer to the memory stored inside of the PNG `image`,
       // which means you're changing the image directly.  No need to `set`
@@ -37,8 +40,6 @@ PNG grayscale(PNG image) {
 
   return image;
 }
-
-
 
 /**
  * Returns an image with a spotlight centered at (`centerX`, `centerY`).
@@ -60,19 +61,23 @@ PNG grayscale(PNG image) {
  *
  * @return The image with a spotlight.
  */
-PNG createSpotlight(PNG image, int centerX, int centerY) {
+PNG createSpotlight(PNG image, int centerX, int centerY)
+{
 
-  for (unsigned x = 0; x < image.width(); x++) {
-    for (unsigned y = 0; y < image.height(); y++) {
-      HSLAPixel & pixel = image.getPixel(x, y);
+  for (unsigned x = 0; x < image.width(); x++)
+  {
+    for (unsigned y = 0; y < image.height(); y++)
+    {
+      HSLAPixel &pixel = image.getPixel(x, y);
 
       double euclidean_distance = sqrt((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY));
-      
+
       double luminance_drop = 0.2;
-      if (euclidean_distance < 160.0) {
+      if (euclidean_distance < 160.0)
+      {
         luminance_drop = 1 - euclidean_distance * .5 / 100;
       }
-      
+
       pixel.l = pixel.l * luminance_drop;
     }
   }
@@ -90,17 +95,20 @@ PNG createSpotlight(PNG image, int centerX, int centerY) {
  *
  * @return The illinify'd image.
 **/
-PNG illinify(PNG image) {
+PNG illinify(PNG image)
+{
 
   const int orange_hue = 11;
   const int blue_hue = 216;
 
-  for (unsigned x = 0; x < image.width(); x++) {
-    for (unsigned y = 0; y < image.height(); y++) {
-      HSLAPixel & pixel = image.getPixel(x, y);
+  for (unsigned x = 0; x < image.width(); x++)
+  {
+    for (unsigned y = 0; y < image.height(); y++)
+    {
+      HSLAPixel &pixel = image.getPixel(x, y);
 
-      double orange_hue_diff = std::abs(orange_hue - pixel.h);
-      double blue_hue_diff = std::abs(blue_hue - pixel.h);
+      double orange_hue_diff = std::min(std::abs(pixel.h - orange_hue), std::abs(pixel.h - 360 - orange_hue));
+      double blue_hue_diff = std::min(std::abs(pixel.h - blue_hue), std::abs(pixel.h - 360 - blue_hue));
 
       if (orange_hue_diff < blue_hue_diff) {
         pixel.h = orange_hue;
@@ -109,10 +117,9 @@ PNG illinify(PNG image) {
       }
     }
   }
-      
+
   return image;
 }
- 
 
 /**
 * Returns an image that has been watermarked by another image.
@@ -126,18 +133,22 @@ PNG illinify(PNG image) {
 *
 * @return The watermarked image.
 */
-PNG watermark(PNG firstImage, PNG secondImage) {
+PNG watermark(PNG firstImage, PNG secondImage)
+{
 
   cs225::PNG watermark;
   watermark = PNG(secondImage);
-  // watermark.resize(firstImage.width(), firstImage.height());
+  watermark.resize(firstImage.width(), firstImage.height());
 
-  for (unsigned x = 0; x < firstImage.width(); x++) {
-    for (unsigned y = 0; y < firstImage.height(); y++) {
+  for (unsigned x = 0; x < firstImage.width(); x++)
+  {
+    for (unsigned y = 0; y < firstImage.height(); y++)
+    {
 
-      HSLAPixel & watermarkPixel = watermark.getPixel(x, y);
-      if (watermarkPixel.l == 1.0) {
-        HSLAPixel & imagePixel = firstImage.getPixel(x, y);
+      HSLAPixel &watermarkPixel = watermark.getPixel(x, y);
+      if (watermarkPixel.l == 1.0)
+      {
+        HSLAPixel &imagePixel = firstImage.getPixel(x, y);
         imagePixel.l = std::min(1.0, imagePixel.l + 0.2);
       }
     }
